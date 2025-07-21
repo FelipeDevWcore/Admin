@@ -360,12 +360,12 @@ export const WowzaServers: React.FC = () => {
                   </TableCell>
                   <TableCell>
                     <div className="text-sm text-gray-900">
-                      {server.streamings_ativas}/{server.limite_streamings}
+                      {server.streamings_ativas || 0}/{server.limite_streamings}
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
                       <div 
                         className="bg-blue-600 h-2 rounded-full" 
-                        style={{ width: `${(server.streamings_ativas / server.limite_streamings) * 100}%` }}
+                        style={{ width: `${((server.streamings_ativas || 0) / server.limite_streamings) * 100}%` }}
                       ></div>
                     </div>
                   </TableCell>

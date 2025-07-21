@@ -32,7 +32,8 @@ router.get('/', authenticateToken, async (req, res) => {
 
     // Buscar servidores
     const [servers] = await pool.execute(
-      `SELECT ws.*, wsp.nome as servidor_principal_nome
+      `SELECT ws.*, wsp.nome as servidor_principal_nome,
+              (SELECT COUNT(*) FROM streamings s WHERE s.codigo_servidor = ws.codigo) as streamings_ativas
        FROM wowza_servers ws
        LEFT JOIN wowza_servers wsp ON ws.servidor_principal_id = wsp.codigo
        ${whereClause} 
@@ -56,7 +57,8 @@ router.get('/', authenticateToken, async (req, res) => {
 router.get('/:id', authenticateToken, async (req, res) => {
   try {
     const [servers] = await pool.execute(
-      `SELECT ws.*, wsp.nome as servidor_principal_nome
+      `SELECT ws.*, wsp.nome as servidor_principal_nome,
+              (SELECT COUNT(*) FROM streamings s WHERE s.codigo_servidor = ws.codigo) as streamings_ativas
        FROM wowza_servers ws
        LEFT JOIN wowza_servers wsp ON ws.servidor_principal_id = wsp.codigo
        WHERE ws.codigo = ?`,

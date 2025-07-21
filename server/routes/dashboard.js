@@ -21,6 +21,20 @@ router.get('/stats', authenticateToken, async (req, res) => {
        GROUP BY status_detalhado`
     );
 
+    // Total de streamings
+    const [totalStreamings] = await pool.execute(
+      'SELECT COUNT(*) as total FROM streamings'
+    );
+
+    // Streamings por status
+    const [streamingsPorStatus] = await pool.execute(
+      `SELECT 
+        status,
+        COUNT(*) as total
+       FROM streamings 
+       GROUP BY status`
+    );
+
     // Somar recursos
     const [recursos] = await pool.execute(
       `SELECT 
@@ -29,6 +43,16 @@ router.get('/stats', authenticateToken, async (req, res) => {
         SUM(espaco_usado_mb) as espacoUsado,
         SUM(bitrate) as totalBitrate
        FROM revendas`
+    );
+
+    // Recursos de streamings
+    const [recursosStreamings] = await pool.execute(
+      `SELECT 
+        SUM(espectadores) as totalEspectadoresStreamings,
+        SUM(espaco_usado) as espacoUsadoStreamings,
+        SUM(bitrate) as totalBitrateStreamings,
+        SUM(espectadores_conectados) as espectadoresConectados
+       FROM streamings`
     );
 
     // Organizar dados por status
@@ -60,13 +84,39 @@ router.get('/stats', authenticateToken, async (req, res) => {
       }
     });
 
+    // Organizar dados de streamings por status
+    const streamingsStatusData = {
+      streamingsAtivas: 0,
+      streamingsInativas: 0,
+      streamingsBloqueadas: 0
+    };
+
+    streamingsPorStatus.forEach(item => {
+      switch (item.status) {
+        case 1:
+          streamingsStatusData.streamingsAtivas = item.total;
+          break;
+        case 0:
+          streamingsStatusData.streamingsInativas = item.total;
+          break;
+        case 2:
+          streamingsStatusData.streamingsBloqueadas = item.total;
+          break;
+      }
+    });
     res.json({
       totalRevendas: totalRevendas[0].total,
       ...statusData,
+      totalStreamings: totalStreamings[0].total,
+      ...streamingsStatusData,
       totalStreamings: recursos[0].totalStreamings || 0,
       totalEspectadores: recursos[0].totalEspectadores || 0,
       espacoUsado: recursos[0].espacoUsado || 0,
-      totalBitrate: recursos[0].totalBitrate || 0
+      totalBitrate: recursos[0].totalBitrate || 0,
+      totalEspectadoresStreamings: recursosStreamings[0].totalEspectadoresStreamings || 0,
+      espacoUsadoStreamings: recursosStreamings[0].espacoUsadoStreamings || 0,
+      totalBitrateStreamings: recursosStreamings[0].totalBitrateStreamings || 0,
+      espectadoresConectados: recursosStreamings[0].espectadoresConectados || 0
     });
 
   } catch (error) {

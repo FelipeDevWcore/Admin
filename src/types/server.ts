@@ -11,7 +11,7 @@ export interface WowzaServer {
   servidor_principal?: WowzaServer;
   tipo_servidor: 'principal' | 'secundario' | 'unico';
   dominio?: string;
-  streamings_ativas: number;
+  streamings_ativas?: number;
   load_cpu: number;
   trafego_rede_atual: number; // MB/s
   trafego_mes: number; // GB

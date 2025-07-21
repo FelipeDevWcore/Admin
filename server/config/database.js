@@ -20,7 +20,7 @@ const settings = {
 
   CORS_ORIGIN: process.env.CORS_ORIGIN 
     ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim())
-    : ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173']
+    : ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173', 'http://localhost:5174']
 };
 
 // Configuração do pool de conexões MySQL

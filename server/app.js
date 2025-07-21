@@ -29,7 +29,8 @@ app.use(limiter);
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
-    if (settings.CORS_ORIGIN.indexOf(origin) !== -1) {
+    const allowedOrigins = Array.isArray(settings.CORS_ORIGIN) ? settings.CORS_ORIGIN : [settings.CORS_ORIGIN];
+    if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
       callback(new Error('Não permitido pelo CORS'));
@@ -37,7 +38,7 @@ app.use(cors({
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
 }));
 
 app.use(express.json({ limit: '10mb' }));

@@ -10,9 +10,17 @@ interface DashboardStats {
   revendasSuspensas: number;
   revendasExpiradas: number;
   totalStreamings: number;
+  streamingsAtivas: number;
+  streamingsInativas: number;
+  streamingsBloqueadas: number;
+  totalStreamings: number;
   totalEspectadores: number;
   espacoUsado: number;
   totalBitrate: number;
+  totalEspectadoresStreamings: number;
+  espacoUsadoStreamings: number;
+  totalBitrateStreamings: number;
+  espectadoresConectados: number;
 }
 
 export const Dashboard: React.FC = () => {
@@ -104,18 +112,6 @@ export const Dashboard: React.FC = () => {
           </div>
         </Card>
 
-        <Card className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-yellow-100 text-sm font-medium">Revendas Suspensas</p>
-              <p className="text-3xl font-bold">{formatNumber(stats?.revendasSuspensas || 0)}</p>
-            </div>
-            <div className="bg-yellow-400 bg-opacity-30 rounded-full p-3">
-              <UserX size={24} />
-            </div>
-          </div>
-        </Card>
-
         <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
           <div className="flex items-center justify-between">
             <div>
@@ -123,6 +119,18 @@ export const Dashboard: React.FC = () => {
               <p className="text-3xl font-bold">{formatNumber(stats?.totalStreamings || 0)}</p>
             </div>
             <div className="bg-purple-400 bg-opacity-30 rounded-full p-3">
+              <Activity size={24} />
+            </div>
+          </div>
+        </Card>
+
+        <Card className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-orange-100 text-sm font-medium">Streamings Ativas</p>
+              <p className="text-3xl font-bold">{formatNumber(stats?.streamingsAtivas || 0)}</p>
+            </div>
+            <div className="bg-orange-400 bg-opacity-30 rounded-full p-3">
               <Activity size={24} />
             </div>
           </div>
@@ -138,46 +146,57 @@ export const Dashboard: React.FC = () => {
           </div>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-gray-600">Total de Espectadores</span>
-              <span className="font-semibold">{formatNumber(stats?.totalEspectadores || 0)}</span>
+              <span className="text-gray-600">Espectadores Conectados</span>
+              <span className="font-semibold">{formatNumber(stats?.espectadoresConectados || 0)}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-gray-600">Espaço Utilizado</span>
-              <span className="font-semibold">{formatBytes((stats?.espacoUsado || 0) * 1024 * 1024)}</span>
+              <span className="text-gray-600">Espaço Usado (Streamings)</span>
+              <span className="font-semibold">{formatBytes((stats?.espacoUsadoStreamings || 0) * 1024 * 1024)}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-gray-600">Bitrate Total</span>
-              <span className="font-semibold">{formatNumber(stats?.totalBitrate || 0)} kbps</span>
+              <span className="text-gray-600">Bitrate Total (Streamings)</span>
+              <span className="font-semibold">{formatNumber(stats?.totalBitrateStreamings || 0)} kbps</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-600">Capacidade Total Espectadores</span>
+              <span className="font-semibold">{formatNumber(stats?.totalEspectadoresStreamings || 0)}</span>
             </div>
           </div>
         </Card>
 
         <Card>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Status das Revendas</h3>
+            <h3 className="text-lg font-semibold text-gray-900">Status dos Serviços</h3>
             <TrendingUp className="text-gray-400" size={20} />
           </div>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <span className="text-gray-600">Ativas</span>
+                <span className="text-gray-600">Revendas Ativas</span>
               </div>
               <span className="font-semibold">{formatNumber(stats?.revendasAtivas || 0)}</span>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                <span className="text-gray-600">Suspensas</span>
+                <span className="text-gray-600">Revendas Suspensas</span>
               </div>
               <span className="font-semibold">{formatNumber(stats?.revendasSuspensas || 0)}</span>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                <span className="text-gray-600">Expiradas</span>
+                <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+                <span className="text-gray-600">Streamings Ativas</span>
               </div>
-              <span className="font-semibold">{formatNumber(stats?.revendasExpiradas || 0)}</span>
+              <span className="font-semibold">{formatNumber(stats?.streamingsAtivas || 0)}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 bg-gray-500 rounded-full"></div>
+                <span className="text-gray-600">Streamings Inativas</span>
+              </div>
+              <span className="font-semibold">{formatNumber(stats?.streamingsInativas || 0)}</span>
             </div>
           </div>
         </Card>
