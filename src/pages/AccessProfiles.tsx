@@ -39,9 +39,13 @@ export const AccessProfiles: React.FC = () => {
     const defaultPermissions: ProfilePermissions = {
         dashboard: { visualizar: false },
         revendas: { visualizar: false, criar: false, editar: false, excluir: false, suspender: false, ativar: false },
+        planos_revenda: { visualizar: false, criar: false, editar: false, excluir: false },
+        planos_streaming: { visualizar: false, criar: false, editar: false, excluir: false },
+        streamings: { visualizar: false, criar: false, editar: false, excluir: false, controlar: false },
         administradores: { visualizar: false, criar: false, editar: false, excluir: false, alterar_status: false },
         servidores: { visualizar: false, criar: false, editar: false, excluir: false, migrar: false, sincronizar: false, inativar: false },
         perfis: { visualizar: false, criar: false, editar: false, excluir: false },
+        configuracoes: { visualizar: false, editar: false },
         logs: { visualizar: false }
     };
 
