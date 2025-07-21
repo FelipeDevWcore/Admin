@@ -7,7 +7,9 @@ import { Select } from '../components/Select';
 import { Table, TableHeader, TableBody, TableCell, TableHeaderCell } from '../components/Table';
 import { Modal } from '../components/Modal';
 import { Pagination } from '../components/Pagination';
+import { PermissionGuard } from '../components/PermissionGuard';
 import { useNotification } from '../contexts/NotificationContext';
+import { useAuth } from '../contexts/AuthContext';
 import { revendaService } from '../services/revendaService';
 import { Revenda } from '../types/revenda';
 import { 
@@ -37,6 +39,7 @@ export const Revendas: React.FC = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const { addNotification } = useNotification();
+  const { hasPermission } = useAuth();
 
   useEffect(() => {
     loadRevendas();
@@ -156,15 +159,18 @@ export const Revendas: React.FC = () => {
   };
 
   return (
+    <PermissionGuard module="revendas" action="visualizar">
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-gray-900">Revendas</h1>
-        <Link to="/revendas/nova">
-          <Button>
-            <Plus size={16} className="mr-2" />
-            Nova Revenda
-          </Button>
-        </Link>
+        {hasPermission('revendas', 'criar') && (
+          <Link to="/revendas/nova">
+            <Button>
+              <Plus size={16} className="mr-2" />
+              Nova Revenda
+            </Button>
+          </Link>
+        )}
       </div>
 
       {/* Filters */}
@@ -272,40 +278,46 @@ export const Revendas: React.FC = () => {
                       >
                         <Eye size={16} />
                       </button>
-                      <Link
-                        to={`/revendas/${revenda.codigo}/editar`}
-                        className="text-gray-600 hover:text-gray-800"
-                        title="Editar"
-                      >
-                        <Edit size={16} />
-                      </Link>
-                      {revenda.status_detalhado === 'ativo' ? (
-                        <button
-                          onClick={() => handleSuspend(revenda.codigo)}
-                          className="text-yellow-600 hover:text-yellow-800"
-                          title="Suspender"
+                      {hasPermission('revendas', 'editar') && (
+                        <Link
+                          to={`/revendas/${revenda.codigo}/editar`}
+                          className="text-gray-600 hover:text-gray-800"
+                          title="Editar"
                         >
-                          <Pause size={16} />
-                        </button>
-                      ) : (
+                          <Edit size={16} />
+                        </Link>
+                      )}
+                      {hasPermission('revendas', 'suspender') && (
+                        revenda.status_detalhado === 'ativo' ? (
+                          <button
+                            onClick={() => handleSuspend(revenda.codigo)}
+                            className="text-yellow-600 hover:text-yellow-800"
+                            title="Suspender"
+                          >
+                            <Pause size={16} />
+                          </button>
+                        ) : hasPermission('revendas', 'ativar') && (
+                          <button
+                            onClick={() => handleActivate(revenda.codigo)}
+                            className="text-green-600 hover:text-green-800"
+                            title="Ativar"
+                          >
+                            <Play size={16} />
+                          </button>
+                        )
+                      )}
+                      {hasPermission('revendas', 'excluir') && (
                         <button
-                          onClick={() => handleActivate(revenda.codigo)}
-                          className="text-green-600 hover:text-green-800"
-                          title="Ativar"
+                          onClick={() => {
+                            setSelectedRevenda(revenda);
+                            setShowDeleteModal(true);
+                          }}
+                          className="text-red-600 hover:text-red-800"
+                          title="Excluir"
                         >
-                          <Play size={16} />
+                          <Trash2 size={16} />
                         </button>
                       )}
-                      <button
-                        onClick={() => {
-                          setSelectedRevenda(revenda);
-                          setShowDeleteModal(true);
-                        }}
-                        className="text-red-600 hover:text-red-800"
-                        title="Excluir"
-                      >
-                        <Trash2 size={16} />
-                      </button>
                     </div>
                   </TableCell>
                 </tr>
@@ -457,5 +469,6 @@ export const Revendas: React.FC = () => {
         )}
       </Modal>
     </div>
+    </PermissionGuard>
   );
 };

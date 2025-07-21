@@ -1,4 +1,5 @@
 import { Admin } from '../types/admin';
+import { AccessProfile } from '../types/profile';
 
 interface LoginResponse {
   admin: Admin;
@@ -68,6 +69,25 @@ class AuthService {
       } catch (error) {
         console.error('Erro ao fazer logout:', error);
       }
+    }
+  }
+
+  async getProfile(profileId: number): Promise<AccessProfile> {
+    try {
+      const token = localStorage.getItem('admin_token');
+      const response = await fetch(`${this.baseURL}/profiles/${profileId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao carregar perfil');
+      }
+
+      return await response.json();
+    } catch (error) {
+      throw error;
     }
   }
 }

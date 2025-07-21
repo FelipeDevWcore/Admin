@@ -40,6 +40,25 @@ export interface ProfilePermissions {
     excluir: boolean;
     controlar: boolean;
   };
+  planos_revenda: {
+    visualizar: boolean;
+    criar: boolean;
+    editar: boolean;
+    excluir: boolean;
+  };
+  planos_streaming: {
+    visualizar: boolean;
+    criar: boolean;
+    editar: boolean;
+    excluir: boolean;
+  };
+  streamings: {
+    visualizar: boolean;
+    criar: boolean;
+    editar: boolean;
+    excluir: boolean;
+    controlar: boolean;
+  };
   administradores: {
     visualizar: boolean;
     criar: boolean;
@@ -61,6 +80,10 @@ export interface ProfilePermissions {
     criar: boolean;
     editar: boolean;
     excluir: boolean;
+  };
+  configuracoes: {
+    visualizar: boolean;
+    editar: boolean;
   };
   configuracoes: {
     visualizar: boolean;

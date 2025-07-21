@@ -1,10 +1,10 @@
 export interface Streaming {
   codigo: number;
-  revenda_id: number;
+  codigo_cliente: number;
   revenda_nome: string;
   plano_id?: number;
   plano_nome?: string;
-  servidor_id: number;
+  codigo_servidor: number;
   servidor_nome: string;
   servidor_ip: string;
   login: string;
@@ -13,33 +13,32 @@ export interface Streaming {
   email: string;
   espectadores: number;
   bitrate: number;
-  espaco_ftp: number;
-  transmissao_srt: boolean;
+  espaco: number;
+  espaco_usado: number;
+  descricao: string;
+  srt_status: 'sim' | 'nao';
   aplicacao: 'tv_station_live_ondemand' | 'live' | 'webrtc' | 'ondemand' | 'ip_camera';
-  idioma: string;
+  idioma_painel: string;
   status: 'ativo' | 'inativo' | 'bloqueado' | 'suspenso';
   espectadores_conectados: number;
-  espaco_usado: number;
-  ultima_conexao?: string;
-  data_criacao: string;
-  data_atualizacao: string;
-  criado_por: number;
+  ultima_atividade?: string;
+  data_cadastro: string;
 }
 
 export interface StreamingFormData {
-  revenda_id: number;
+  codigo_cliente: number;
   plano_id?: number;
-  servidor_id: number;
+  codigo_servidor: number;
   login: string;
   senha: string;
   identificacao: string;
   email: string;
   espectadores: number;
   bitrate: number;
-  espaco_ftp: number;
-  transmissao_srt: boolean;
+  espaco: number;
+  descricao: string;
   aplicacao: 'tv_station_live_ondemand' | 'live' | 'webrtc' | 'ondemand' | 'ip_camera';
-  idioma: string;
+  idioma_painel: string;
 }
 
 export interface StreamingStats {

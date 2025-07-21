@@ -193,6 +193,39 @@ export const AccessProfiles: React.FC = () => {
         return new Date(dateString).toLocaleDateString('pt-BR');
     };
 
+    const getModuleLabel = (module: string) => {
+        const labels: { [key: string]: string } = {
+            dashboard: 'Dashboard',
+            revendas: 'Revendas',
+            planos_revenda: 'Planos de Revenda',
+            planos_streaming: 'Planos de Streaming',
+            streamings: 'Streamings',
+            administradores: 'Administradores',
+            servidores: 'Servidores',
+            perfis: 'Perfis de Acesso',
+            configuracoes: 'Configurações',
+            logs: 'Logs do Sistema'
+        };
+        return labels[module] || module;
+    };
+
+    const getActionLabel = (action: string) => {
+        const labels: { [key: string]: string } = {
+            visualizar: 'Visualizar',
+            criar: 'Criar',
+            editar: 'Editar',
+            excluir: 'Excluir',
+            suspender: 'Suspender',
+            ativar: 'Ativar',
+            alterar_status: 'Alterar Status',
+            migrar: 'Migrar',
+            sincronizar: 'Sincronizar',
+            inativar: 'Inativar',
+            controlar: 'Controlar'
+        };
+        return labels[action] || action.replace('_', ' ');
+    };
+
     if (currentAdmin?.nivel_acesso !== 'super_admin') {
         return (
             <div className="text-center py-8">
@@ -387,7 +420,7 @@ export const AccessProfiles: React.FC = () => {
                         <div className="space-y-6">
                             {Object.entries(formData.permissoes).map(([module, permissions]) => (
                                 <div key={module} className="border rounded-lg p-4">
-                                    <h4 className="font-medium text-gray-900 mb-3 capitalize">{module}</h4>
+                                    <h4 className="font-medium text-gray-900 mb-3 capitalize">{getModuleLabel(module)}</h4>
                                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                                         {Object.entries(permissions).map(([action, value]) => (
                                             <div key={action} className="flex items-center space-x-2">
@@ -399,7 +432,7 @@ export const AccessProfiles: React.FC = () => {
                                                     className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
                                                 />
                                                 <label htmlFor={`${module}-${action}`} className="text-sm text-gray-700 capitalize">
-                                                    {action.replace('_', ' ')}
+                                                    {getActionLabel(action)}
                                                 </label>
                                             </div>
                                         ))}

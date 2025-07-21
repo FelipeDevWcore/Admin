@@ -82,7 +82,7 @@ router.get('/:id', authenticateToken, async (req, res) => {
       return res.status(404).json({ message: 'Streaming não encontrada' });
     }
 
-    const { senha, ...streamingData } = streamings[0];
+    const { senha, senha_transmissao, ...streamingData } = streamings[0];
     res.json(streamingData);
 
   } catch (error) {
@@ -95,7 +95,7 @@ router.post('/', authenticateToken, requireLevel(['super_admin', 'admin']), asyn
   try {
     const {
       codigo_cliente, plano_id, codigo_servidor, login, senha, identificacao, email,
-      espectadores, bitrate, espaco_ftp, transmissao_srt, aplicacao, idioma
+      espectadores, bitrate, espaco, aplicacao, idioma_painel, descricao
     } = req.body;
 
     const [existingStreaming] = await pool.execute(
@@ -108,15 +108,23 @@ router.post('/', authenticateToken, requireLevel(['super_admin', 'admin']), asyn
     }
 
     const senhaHash = await bcrypt.hash(senha, 10);
+    const senhaTransmissaoHash = await bcrypt.hash(senha, 10); // Mesma senha para transmissão por padrão
+
+    // Gerar diretório FTP baseado no login
+    const ftpDir = `/home/streaming/${login}`;
 
     const [result] = await pool.execute(
       `INSERT INTO streamings (
-        codigo_cliente, plano_id, codigo_servidor, login, senha, identificacao, email,
-        espectadores, bitrate, espaco_ftp, transmissao_srt, aplicacao, idioma, criado_por
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        codigo_cliente, plano_id, codigo_servidor, login, senha, senha_transmissao,
+        identificacao, email, espectadores, bitrate, espaco, espaco_usado,
+        ftp_dir, aplicacao, idioma_painel, descricao, data_cadastro,
+        player_titulo, player_descricao, app_nome, app_email
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?, ?, ?)`,
       [
-        codigo_cliente, plano_id || null, codigo_servidor, login, senhaHash, identificacao, email,
-        espectadores, bitrate, espaco_ftp, transmissao_srt ? 1 : 0, aplicacao, idioma, req.admin.codigo
+        codigo_cliente, plano_id || null, codigo_servidor, login, senhaHash, senhaTransmissaoHash,
+        identificacao, email, espectadores, bitrate, espaco, 0,
+        ftpDir, aplicacao || 'live', idioma_painel || 'pt-br', descricao || '',
+        identificacao, descricao || '', identificacao, email
       ]
     );
 
@@ -145,24 +153,26 @@ router.put('/:id', authenticateToken, requireLevel(['super_admin', 'admin']), as
 
     const {
       codigo_cliente, plano_id, codigo_servidor, login, senha, identificacao, email,
-      espectadores, bitrate, espaco_ftp, transmissao_srt, aplicacao, idioma
+      espectadores, bitrate, espaco, aplicacao, idioma_painel, descricao
     } = req.body;
 
     let updateQuery = `
       UPDATE streamings SET 
-        codigo_cliente = ?, plano_id = ?, codigo_servidor = ?, login = ?, identificacao = ?, email = ?,
-        espectadores = ?, bitrate = ?, espaco_ftp = ?, transmissao_srt = ?, aplicacao = ?, idioma = ?
+        codigo_cliente = ?, plano_id = ?, codigo_servidor = ?, login = ?, 
+        identificacao = ?, email = ?, espectadores = ?, bitrate = ?, espaco = ?,
+        aplicacao = ?, idioma_painel = ?, descricao = ?
     `;
 
     let params = [
-      codigo_cliente, plano_id || null, codigo_servidor, login, identificacao, email,
-      espectadores, bitrate, espaco_ftp, transmissao_srt ? 1 : 0, aplicacao, idioma
+      codigo_cliente, plano_id || null, codigo_servidor, login,
+      identificacao, email, espectadores, bitrate, espaco,
+      aplicacao || 'live', idioma_painel || 'pt-br', descricao || ''
     ];
 
     if (senha && senha.trim() !== '') {
       const senhaHash = await bcrypt.hash(senha, 10);
-      updateQuery += ', senha = ?';
-      params.push(senhaHash);
+      updateQuery += ', senha = ?, senha_transmissao = ?';
+      params.push(senhaHash, senhaHash);
     }
 
     updateQuery += ' WHERE codigo = ?';
@@ -223,7 +233,7 @@ router.post('/:id/restart', authenticateToken, async (req, res) => {
     const streamingId = req.params.id;
 
     await pool.execute(
-      'UPDATE streamings SET status = ?, ultima_conexao = NOW() WHERE codigo = ?',
+      'UPDATE streamings SET status = ?, ultima_atividade = NOW() WHERE codigo = ?',
       [STATUS_ATIVO, streamingId]
     );
 
@@ -280,7 +290,7 @@ router.post('/:id/sync', authenticateToken, async (req, res) => {
     const streamingId = req.params.id;
 
     await pool.execute(
-      'UPDATE streamings SET data_atualizacao = NOW() WHERE codigo = ?',
+      'UPDATE streamings SET ultima_atividade = NOW() WHERE codigo = ?',
       [streamingId]
     );
 
@@ -302,8 +312,8 @@ router.post('/:id/change-password', authenticateToken, async (req, res) => {
     const senhaHash = await bcrypt.hash(senha, 10);
 
     await pool.execute(
-      'UPDATE streamings SET senha = ? WHERE codigo = ?',
-      [senhaHash, streamingId]
+      'UPDATE streamings SET senha = ?, senha_transmissao = ? WHERE codigo = ?',
+      [senhaHash, senhaHash, streamingId]
     );
 
     await logAdminAction(req.admin.codigo, 'change_password', 'streamings', streamingId, null, null, req);

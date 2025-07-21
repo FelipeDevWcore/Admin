@@ -25,19 +25,19 @@ export const StreamingForm: React.FC = () => {
   const [servers, setServers] = useState<WowzaServer[]>([]);
 
   const [formData, setFormData] = useState<StreamingFormData>({
-    revenda_id: 0,
+    codigo_cliente: 0,
     plano_id: undefined,
-    servidor_id: 0,
+    codigo_servidor: 0,
     login: '',
     senha: '',
     identificacao: '',
     email: '',
     espectadores: 100,
     bitrate: 2000,
-    espaco_ftp: 1000,
-    transmissao_srt: false,
+    espaco: 1000,
+    descricao: '',
     aplicacao: 'live',
-    idioma: 'pt-br'
+    idioma_painel: 'pt-br'
   });
 
   useEffect(() => {
@@ -73,19 +73,19 @@ export const StreamingForm: React.FC = () => {
       setLoading(true);
       const streaming = await streamingService.getStreaming(Number(id));
       setFormData({
-        revenda_id: streaming.revenda_id,
+        codigo_cliente: streaming.codigo_cliente,
         plano_id: streaming.plano_id,
-        servidor_id: streaming.servidor_id,
+        codigo_servidor: streaming.codigo_servidor,
         login: streaming.login,
         senha: '', // Não carregamos a senha por segurança
         identificacao: streaming.identificacao,
         email: streaming.email,
         espectadores: streaming.espectadores,
         bitrate: streaming.bitrate,
-        espaco_ftp: streaming.espaco_ftp,
-        transmissao_srt: streaming.transmissao_srt,
+        espaco: streaming.espaco,
+        descricao: streaming.descricao,
         aplicacao: streaming.aplicacao,
-        idioma: streaming.idioma
+        idioma_painel: streaming.idioma_painel
       });
     } catch (error: any) {
       addNotification({
@@ -109,7 +109,7 @@ export const StreamingForm: React.FC = () => {
         addNotification({
           type: 'success',
           title: 'Sucesso',
-          message: 'Streaming atualizada com sucesso.'
+          espaco: plan.espaco_ftp
         });
       } else {
         await streamingService.createStreaming(formData);
@@ -208,8 +208,8 @@ export const StreamingForm: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Select
               label="Revenda Responsável *"
-              name="revenda_id"
-              value={formData.revenda_id.toString()}
+              name="codigo_cliente"
+              value={formData.codigo_cliente.toString()}
               onChange={handleChange}
               options={[
                 { value: '0', label: 'Selecione uma revenda' },
@@ -269,8 +269,8 @@ export const StreamingForm: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Select
               label="Servidor *"
-              name="servidor_id"
-              value={formData.servidor_id.toString()}
+              name="codigo_servidor"
+              value={formData.codigo_servidor.toString()}
               onChange={handleChange}
               options={[
                 { value: '0', label: 'Selecione um servidor' },
@@ -294,8 +294,8 @@ export const StreamingForm: React.FC = () => {
             />
             <Select
               label="Idioma *"
-              name="idioma"
-              value={formData.idioma}
+              name="idioma_painel"
+              value={formData.idioma_painel}
               onChange={handleChange}
               options={[
                 { value: 'pt-br', label: 'Português (BR)' },
@@ -304,19 +304,13 @@ export const StreamingForm: React.FC = () => {
               ]}
               required
             />
-            <div className="flex items-center space-x-2 mt-6">
-              <input
-                type="checkbox"
-                id="transmissao_srt"
-                name="transmissao_srt"
-                checked={formData.transmissao_srt}
-                onChange={handleChange}
-                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-              />
-              <label htmlFor="transmissao_srt" className="text-sm font-medium text-gray-700">
-                Transmissão SRT
-              </label>
-            </div>
+            <Input
+              label="Descrição"
+              name="descricao"
+              value={formData.descricao}
+              onChange={handleChange}
+              placeholder="Descrição da streaming"
+            />
           </div>
         </Card>
 
@@ -347,11 +341,11 @@ export const StreamingForm: React.FC = () => {
               required
             />
             <Input
-              label="Espaço FTP (MB) *"
-              name="espaco_ftp"
+              label="Espaço (MB) *"
+              name="espaco"
               type="number"
               min="100"
-              value={formData.espaco_ftp}
+              value={formData.espaco}
               onChange={handleChange}
               required
             />

@@ -23,7 +23,7 @@ interface LayoutProps {
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { admin, logout } = useAuth();
+  const { admin, logout, hasPermission } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -33,17 +33,17 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   };
 
   const menuItems = [
-    { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
-    { icon: Users, label: 'Revendas', path: '/revendas' },
-    { icon: Package, label: 'Planos Revenda', path: '/planos-revenda' },
-    { icon: Play, label: 'Planos Streaming', path: '/planos-streaming' },
-    { icon: Activity, label: 'Streamings', path: '/streamings' },
-    { icon: Server, label: 'Servidores', path: '/servidores' },
-    { icon: Settings, label: 'Administradores', path: '/administradores' },
-    { icon: Shield, label: 'Perfis de Acesso', path: '/perfis', superAdminOnly: true },
-    { icon: Settings, label: 'Configurações', path: '/configuracoes', adminOnly: true },
-    { icon: FileText, label: 'Logs', path: '/logs' },
-    { icon: User, label: 'Perfil', path: '/perfil' },
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard', module: 'dashboard', action: 'visualizar' },
+    { icon: Users, label: 'Revendas', path: '/revendas', module: 'revendas', action: 'visualizar' },
+    { icon: Package, label: 'Planos Revenda', path: '/planos-revenda', module: 'planos_revenda', action: 'visualizar' },
+    { icon: Play, label: 'Planos Streaming', path: '/planos-streaming', module: 'planos_streaming', action: 'visualizar' },
+    { icon: Activity, label: 'Streamings', path: '/streamings', module: 'streamings', action: 'visualizar' },
+    { icon: Server, label: 'Servidores', path: '/servidores', module: 'servidores', action: 'visualizar' },
+    { icon: Settings, label: 'Administradores', path: '/administradores', module: 'administradores', action: 'visualizar' },
+    { icon: Shield, label: 'Perfis de Acesso', path: '/perfis', module: 'perfis', action: 'visualizar', superAdminOnly: true },
+    { icon: Settings, label: 'Configurações', path: '/configuracoes', module: 'configuracoes', action: 'visualizar' },
+    { icon: FileText, label: 'Logs', path: '/logs', module: 'logs', action: 'visualizar' },
+    { icon: User, label: 'Perfil', path: '/perfil', alwaysShow: true },
   ];
 
   return (
@@ -68,9 +68,9 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         
         <nav className="mt-8">
           {menuItems.map((item) => (
-            // Só mostra itens de super admin se o usuário for super admin
-            (item.superAdminOnly && admin?.nivel_acesso !== 'super_admin') || 
-            (item.adminOnly && !['super_admin', 'admin'].includes(admin?.nivel_acesso || '')) ? null : (
+            // Verificar permissões
+            (item.superAdminOnly && admin?.nivel_acesso !== 'super_admin') ||
+            (!item.alwaysShow && !hasPermission(item.module || '', item.action || '')) ? null : (
             <Link
               key={item.path}
               to={item.path}
